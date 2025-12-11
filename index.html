@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Celestia Archive</title>
+
 <style>
     body {
         background: black;
@@ -33,84 +34,97 @@
         font-weight: bold;
     }
 
-    /* 노이즈 효과 */
+    /* Safari-safe glitch 효과 */
     @keyframes glitch {
-        0% {clip-path: inset(0 0 0 0);}
-        20% {clip-path: inset(10% 0 5% 0);}
-        40% {clip-path: inset(2% 0 15% 0);}
-        60% {clip-path: inset(8% 0 3% 0);}
-        80% {clip-path: inset(4% 0 10% 0);}
-        100% {clip-path: inset(0 0 0 0);}
+        0% { transform: translate(0, 0); }
+        20% { transform: translate(2px, -2px); }
+        40% { transform: translate(-2px, 2px); }
+        60% { transform: translate(2px, 1px); }
+        80% { transform: translate(-1px, -1px); }
+        100% { transform: translate(0, 0); }
     }
 
     .glitch {
-        animation: glitch 0.25s infinite;
+        animation: glitch 0.12s infinite;
     }
 
-    /* 글자가 꾸물거리는 효과 */
+    /* 꾸물거리는 효과 */
     @keyframes wavy {
         0% {transform: translateY(0);}
         50% {transform: translateY(-4px);}
         100% {transform: translateY(0);}
     }
-    .wavy span {
-        display: inline-block;
+
+    .wavy {
         animation: wavy 0.4s ease-in-out infinite;
     }
 
-    /* 붉게 변하는 텍스트 */
+    @keyframes redShift {
+        0% { color: white; }
+        50% { color: #ff3b3b; }
+        100% { color: #8b0000; }
+    }
+
     .redshift {
         animation: redShift 2.5s forwards;
     }
+</style>
+</head>
 
-    @keyframes 레드시프트 {
- 0% {색상: 흰색;}
- 50% {color: #ff3b3b;}
- 100% {색상: #8b0000;}
-    }
-</스타일.>
-</머리>
+<body>
 
-<몸>
 <div id="text"></div>
 
-<대본>
-const textElement= document.getElementById("text");
+<script>
+const textElement = document.getElementById("text");
 
-장면 구성 = [
- { text: "⚠ 비정상적인 경로입니다. ⚠\n\n⚠ 보안 시스템을 가동합니다. ⚠", class: "warning glitch" },
+const scenes = [
+    {
+        text: "⚠ 비정상적인 경로입니다. ⚠\n\n⚠ 보안 시스템을 가동합니다. ⚠",
+        class: "warning glitch"
+    },
 
- { text: "옛날 하늘에는 창세의 해와 달이 있었어.\n\n그 둘은 영원히 마주볼 수 없었지만 \n\n그 누구보다 사이가 좋았지.\n\n그들은 어느날 칠악을 없애는 명을 받게 되었어.\n\n해는 해의 사자로, 달은 달의 사자로\n\n천사가 되어 윤회하는 칠악을 제거해왔지", class: "" },
+    {
+        text: "옛날 하늘에는 창세의 해와 달이 있었어.\n\n그 둘은 영원히 마주볼 수 없었지만\n\n그 누구보다 사이가 좋았지.\n\n그들은 어느날 칠악을 없애는 명을 받게 되었어.\n\n해는 해의 사자로, 달은 달의 사자로\n\n천사가 되어 윤회하는 칠악을 제거해왔지",
+        class: ""
+    },
 
- { 텍스트: "⚠ 비이상적인 접근 감지 중 ⚠", 클래스: "경고 결함" },
+    {
+        text: "⚠ 비이상적인 접근 감지 중 ⚠",
+        class: "warning glitch"
+    },
 
- { 텍스트: "하지만 달은 결국 밤에게 삼켜졌으며", 클래스: "wav 적색편이 결함" }
+    {
+        text: "하지만 달은 결국 밤에게 삼켜졌으며,",
+        class: "wavy redshift glitch"
+    }
 ];
 
-인덱스 = 0이라고 가정합니다;
+let index = 0;
 
-기능. 활자 장면() {
- 장면 = 장면[인덱스];
- textElement.class이름 = scene.class;
- textElement.style.opacity = 0;
+function typeScene() {
+    const scene = scenes[index];
 
- setTimeout((() => {
- textElement.innerHTML = scene.text;
- textElement.style.opacity = 1;
- }, 300);
+    textElement.className = scene.class;
+    textElement.style.opacity = 0;
 
- // 다음 장면으로 넘김
- setTimeout((() => {
- textElement.style.opacity = 0;
- 인덱스++;
- 만약 (인덱스 < scenes.length) {
- setTimeout(typeScene, 1000);
+    setTimeout(() => {
+        textElement.innerHTML = scene.text;
+        textElement.style.opacity = 1;
+    }, 300);
+
+    setTimeout(() => {
+        textElement.style.opacity = 0;
+        index++;
+
+        if (index < scenes.length) {
+            setTimeout(typeScene, 1000);
         }
- }, 3500);
+    }, 3500);
 }
 
-타입Scene();
+typeScene();
 </script>
 
 </body>
- </HTML>
+</html>
