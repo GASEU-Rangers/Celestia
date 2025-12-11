@@ -27,50 +27,31 @@
         transition: opacity 0.8s ease;
     }
 
-    /* 빨간 경고문 */
     .warning {
         color: #ff3b3b;
         text-shadow: 0 0 8px #ff0000;
         font-weight: bold;
     }
 
-    /* Safari-safe glitch 효과 */
     @keyframes glitch {
-        0% { transform: translate(0, 0); }
-        20% { transform: translate(2px, -2px); }
-        40% { transform: translate(-2px, 2px); }
-        60% { transform: translate(2px, 1px); }
-        80% { transform: translate(-1px, -1px); }
-        100% { transform: translate(0, 0); }
+        0% {clip-path: inset(0 0 0 0);}
+        20% {clip-path: inset(10% 0 5% 0);}
+        40% {clip-path: inset(2% 0 15% 0);}
+        60% {clip-path: inset(8% 0 3% 0);}
+        80% {clip-path: inset(4% 0 10% 0);}
+        100% {clip-path: inset(0 0 0 0);}
     }
-
-    .glitch {
-        animation: glitch 0.12s infinite;
-    }
-
-    /* 꾸물거리는 효과 */
-    @keyframes wavy {
-        0% {transform: translateY(0);}
-        50% {transform: translateY(-4px);}
-        100% {transform: translateY(0);}
-    }
-
-    .wavy {
-        animation: wavy 0.4s ease-in-out infinite;
-    }
+    .glitch { animation: glitch 0.25s infinite; }
 
     @keyframes redShift {
         0% { color: white; }
         50% { color: #ff3b3b; }
         100% { color: #8b0000; }
     }
+    .redshift { animation: redShift 2.5s forwards; }
 
-    .redshift {
-        animation: redShift 2.5s forwards;
-    }
 </style>
 </head>
-
 <body>
 
 <div id="text"></div>
@@ -78,52 +59,75 @@
 <script>
 const textElement = document.getElementById("text");
 
+// ⬇⬇ "한 문장씩" 자동 분리 가능하도록 \n 으로 나눔
 const scenes = [
     {
-        text: "⚠ 비정상적인 경로입니다. ⚠\n\n⚠ 보안 시스템을 가동합니다. ⚠",
+        text: [
+            "⚠ 비정상적인 경로입니다. ⚠",
+            "⚠ 보안 시스템을 가동합니다. ⚠"
+        ],
         class: "warning glitch"
     },
-
     {
-        text: "옛날 하늘에는 창세의 해와 달이 있었어.\n\n그 둘은 영원히 마주볼 수 없었지만\n\n그 누구보다 사이가 좋았지.\n\n그들은 어느날 칠악을 없애는 명을 받게 되었어.\n\n해는 해의 사자로, 달은 달의 사자로\n\n천사가 되어 윤회하는 칠악을 제거해왔지",
+        text: [
+            "옛날 하늘에는 창세의 해와 달이 있었어.",
+            "그 둘은 영원히 마주볼 수 없었지만",
+            "그 누구보다 사이가 좋았지.",
+            "그들은 어느날 칠악을 없애는 명을 받게 되었어.",
+            "해는 해의 사자로, 달은 달의 사자로",
+            "천사가 되어 윤회하는 칠악을 제거해왔지"
+        ],
         class: ""
     },
-
     {
-        text: "⚠ 비이상적인 접근 감지 중 ⚠",
+        text: ["⚠ 비이상적인 접근 감지 중 ⚠"],
         class: "warning glitch"
     },
-
     {
-        text: "하지만 달은 결국 밤에게 삼켜졌으며,",
-        class: "wavy redshift glitch"
+        text: ["하지만 달은 결국 밤에게 삼켜졌으며,"],
+        class: "redshift glitch"
     }
 ];
 
-let index = 0;
+let sceneIndex = 0;
+let lineIndex = 0;
 
-function typeScene() {
-    const scene = scenes[index];
+function showLine() {
+    const scene = scenes[sceneIndex];
+    const lines = scene.text;
 
+    // 효과 적용
     textElement.className = scene.class;
     textElement.style.opacity = 0;
 
+    // 내용 변경 + 페이드인
     setTimeout(() => {
-        textElement.innerHTML = scene.text;
+        textElement.innerHTML = lines[lineIndex];
         textElement.style.opacity = 1;
     }, 300);
 
+    // 다음 문장
     setTimeout(() => {
         textElement.style.opacity = 0;
-        index++;
+        lineIndex++;
 
-        if (index < scenes.length) {
-            setTimeout(typeScene, 1000);
+        // 아직 같은 scene 안에 문장이 남아있으면 계속
+        if (lineIndex < lines.length) {
+            setTimeout(showLine, 1000);
+        } 
+        else {
+            // 다음 scene으로 이동
+            sceneIndex++;
+            lineIndex = 0;
+
+            if (sceneIndex < scenes.length) {
+                setTimeout(showLine, 1000);
+            }
         }
-    }, 3500);
+    }, 2500);
 }
 
-typeScene();
+showLine();
 </script>
 
 </body>
