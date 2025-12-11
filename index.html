@@ -30,27 +30,73 @@
         transition: opacity 0.8s ease;
     }
 
-    /* 빨간 경고문 */
+    /* ========== 경고문 스타일(발광 X, 깔끔한 빨강) ========== */
     .warning {
         color: #ff3b3b;
-        text-shadow: 0 0 8px #ff0000;
         font-weight: bold;
     }
 
-    /* 노이즈 효과 */
-    @keyframes glitch {
-        0% { clip-path: inset(0 0 0 0); }
-        20% { clip-path: inset(15% 0 10% 0); }
-        40% { clip-path: inset(5% 0 20% 0); }
-        60% { clip-path: inset(20% 0 5% 0); }
-        80% { clip-path: inset(10% 0 15% 0); }
-        100% { clip-path: inset(0 0 0 0); }
-    }
-    .glitch {
-        animation: glitch 0.2s infinite;
+    /* ========== 슈퍼 글리치 ========== */
+    .superglitch {
+        position: relative;
+        display: inline-block;
+        animation: glitchSkew 0.8s infinite linear alternate-reverse;
     }
 
-    /* 붉게 변하며 죽어가는 효과 */
+    .superglitch::before,
+    .superglitch::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    /* 붉은 분리 레이어 */
+    .superglitch::before {
+        left: 2px;
+        top: -1px;
+        color: #ff0000;
+        animation: glitchClip 0.25s infinite linear alternate-reverse;
+    }
+
+    /* 파란 분리 레이어 */
+    .superglitch::after {
+        left: -2px;
+        top: 1px;
+        color: #00aaff;
+        animation: glitchClip2 0.3s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitchClip {
+        0% { clip-path: inset(0 0 90% 0); }
+        20% { clip-path: inset(40% 0 40% 0); }
+        40% { clip-path: inset(80% 0 10% 0); }
+        60% { clip-path: inset(15% 0 70% 0); }
+        80% { clip-path: inset(60% 0 30% 0); }
+        100% { clip-path: inset(0 0 90% 0); }
+    }
+
+    @keyframes glitchClip2 {
+        0% { clip-path: inset(80% 0 0 0); }
+        20% { clip-path: inset(30% 0 60% 0); }
+        40% { clip-path: inset(10% 0 80% 0); }
+        60% { clip-path: inset(70% 0 20% 0); }
+        80% { clip-path: inset(50% 0 40% 0); }
+        100% { clip-path: inset(80% 0 0 0); }
+    }
+
+    @keyframes glitchSkew {
+        0% { transform: skew(0deg); }
+        20% { transform: skew(3deg); }
+        40% { transform: skew(-3deg); }
+        60% { transform: skew(2deg); }
+        80% { transform: skew(-2deg); }
+        100% { transform: skew(0deg); }
+    }
+
+    /* ===== 붉게 변하며 꺼지는 효과 ===== */
     @keyframes redShift {
         0% { color: #ffffff; }
         40% { color: #ff3b3b; }
@@ -61,7 +107,7 @@
         animation: redShift 2.5s forwards;
     }
 
-    /* 흔들리며 버그나는 효과 */
+    /* 흔들리는 버그 효과 */
     @keyframes shake {
         0% { transform: translate(-2px, -1px); }
         25% { transform: translate(3px, 2px); }
@@ -84,8 +130,14 @@
 const textElement = document.getElementById("text");
 
 const scenes = [
-    { text: "⚠ 비정상적인 경로입니다. ⚠", class: "warning glitch" },
-    { text: "⚠ 보안 시스템을 가동합니다. ⚠", class: "warning glitch" },
+    {
+        text: "⚠ 비정상적인 경로입니다. ⚠",
+        class: "warning superglitch"
+    },
+    {
+        text: "⚠ 보안 시스템을 가동합니다. ⚠",
+        class: "warning superglitch"
+    },
 
     { text: "옛날 하늘에는 창세의 해와 달이 있었어.", class: "" },
     { text: "그 둘은 영원히 마주볼 수 없었지만", class: "" },
@@ -94,8 +146,8 @@ const scenes = [
     { text: "해는 해의 사자로, 달은 달의 사자로", class: "" },
     { text: "천사가 되어 윤회하는 칠악을 제거해왔지", class: "" },
 
-    // 마지막 — 노이즈 파열 + 붉은 번짐 + 흔들림
-    { text: "하지만 달은 결국 밤에게 삼켜졌으며,", class: "glitch redshift shake" }
+    // 마지막 — 강한 노이즈 + 붉은 변색 + 흔들림
+    { text: "하지만 달은 결국 밤에게 삼켜졌으며,", class: "shake redshift superglitch" }
 ];
 
 let index = 0;
@@ -104,6 +156,7 @@ function typeScene() {
     const scene = scenes[index];
 
     textElement.className = scene.class;
+    textElement.setAttribute("data-text", scene.text);
     textElement.style.opacity = 0;
 
     setTimeout(() => {
@@ -111,12 +164,10 @@ function typeScene() {
         textElement.style.opacity = 1;
     }, 200);
 
-    // 다음 장면으로 넘어가기 + 마지막 장면 처리
     setTimeout(() => {
         textElement.style.opacity = 0;
         index++;
 
-        // 마지막 문장 끝난 후 강제 이동
         if (index === scenes.length) {
             setTimeout(() => {
                 window.location.href = "https://www.google.com";  // 원하는 링크로 변경
