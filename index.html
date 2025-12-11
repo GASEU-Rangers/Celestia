@@ -2,104 +2,86 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Celestia</title>
-<style>
-    @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/BMyeongjo.woff2');
+<title>Celestia Archive</title>
 
+<!-- 명조체 폰트 -->
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-myeongjo.css" rel="stylesheet">
+
+<style>
     body {
-        margin: 0;
-        padding: 0;
         background: black;
         color: white;
-        font-family: 'BMyeongjo', serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+        font-family: 'NanumMyeongjo', serif;
         overflow: hidden;
+        margin: 0;
+        padding: 0;
     }
 
-    #textBox {
-        font-size: 2rem;
+    #text {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        transform: translateY(-50%);
         text-align: center;
-        opacity: 0;
-        transition: opacity 1.2s ease-in-out;
+        font-size: 2rem;
+        line-height: 3.2rem;
         white-space: pre-line;
+        opacity: 0;
+        transition: opacity 0.8s ease;
     }
 
+    /* 빨간 경고문 */
     .warning {
         color: #ff3b3b;
+        text-shadow: 0 0 8px #ff0000;
+        font-weight: bold;
     }
 
-    /* 기본 glitch 효과 */
+    /* 노이즈 효과 */
+    @keyframes glitch {
+        0% { clip-path: inset(0 0 0 0); }
+        20% { clip-path: inset(15% 0 10% 0); }
+        40% { clip-path: inset(5% 0 20% 0); }
+        60% { clip-path: inset(20% 0 5% 0); }
+        80% { clip-path: inset(10% 0 15% 0); }
+        100% { clip-path: inset(0 0 0 0); }
+    }
     .glitch {
-        position: relative;
-        animation: glitchAnim 0.8s infinite;
+        animation: glitch 0.2s infinite;
     }
 
-    @keyframes glitchAnim {
-        0% { text-shadow: 2px 2px red; }
-        20% { text-shadow: -2px -2px blue; }
-        40% { text-shadow: 2px -2px green; }
-        60% { text-shadow: -2px 2px purple; }
-        100% { text-shadow: none; }
+    /* 붉게 변하며 죽어가는 효과 */
+    @keyframes redShift {
+        0% { color: #ffffff; }
+        40% { color: #ff3b3b; }
+        70% { color: #8b0000; }
+        100% { color: #000000; }
     }
-
-    /* 붉게 변화 */
     .redshift {
-        animation: redshift 2s infinite alternate ease-in-out;
+        animation: redShift 2.5s forwards;
     }
 
-    @keyframes redshift {
-        0% { color: white; }
-        100% { color: #ff1b1b; }
+    /* 흔들리며 버그나는 효과 */
+    @keyframes shake {
+        0% { transform: translate(-2px, -1px); }
+        25% { transform: translate(3px, 2px); }
+        50% { transform: translate(-4px, 1px); }
+        75% { transform: translate(2px, -3px); }
+        100% { transform: translateY(-50%); }
     }
-
-    /* 파도 효과 */
-    .wavy {
-        display: inline-block;
-        animation: wavy 1.6s infinite ease-in-out;
-    }
-
-    @keyframes wavy {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(-6px); }
-        100% { transform: translateY(0); }
-    }
-
-    /* 마지막 장면용 큰 노이즈 효과 */
-    .final-glitch {
-        animation: finalGlitch 0.12s infinite;
-    }
-
-    @keyframes finalGlitch {
-        0% { transform: translate(2px, -2px) skew(2deg); }
-        20% { transform: translate(-3px, 1px) skew(-3deg); }
-        40% { transform: translate(1px, 3px) skew(1deg); }
-        60% { transform: translate(-2px, -1px) skew(-2deg); }
-        80% { transform: translate(3px, 2px) skew(3deg); }
-        100% { transform: translate(0, 0) skew(0deg); }
-    }
-
-    /* 화면 전체가 순간적으로 깨져보이게 하는 효과 */
-    .screen-break {
-        animation: screenBreak 0.2s 6;
-    }
-
-    @keyframes screenBreak {
-        0% { filter: contrast(200%) brightness(200%) hue-rotate(20deg); }
-        50% { filter: contrast(50%) brightness(50%) hue-rotate(-20deg); }
-        100% { filter: none; }
+    .shake {
+        animation: shake 0.15s infinite;
     }
 
 </style>
 </head>
+
 <body>
 
-<div id="textBox"></div>
+<div id="text"></div>
 
 <script>
-const redirectURL = "https://example.com"; // 🔥 이동시키고 싶은 외부 링크 넣기
+const textElement = document.getElementById("text");
 
 const scenes = [
     { text: "⚠ 비정상적인 경로입니다. ⚠", class: "warning glitch" },
@@ -112,70 +94,43 @@ const scenes = [
     { text: "해는 해의 사자로, 달은 달의 사자로", class: "" },
     { text: "천사가 되어 윤회하는 칠악을 제거해왔지", class: "" },
 
-    // 마지막 장면 (특수 효과 적용)
-    { 
-        text: "하지만 달은 결국 밤에게 삼켜졌으며,", 
-        class: "final-glitch redshift wavy"
-    }
+    // 마지막 — 노이즈 파열 + 붉은 번짐 + 흔들림
+    { text: "하지만 달은 결국 밤에게 삼켜졌으며,", class: "glitch redshift shake" }
 ];
 
-const textBox = document.getElementById("textBox");
 let index = 0;
 
-function showScene() {
-    if (index >= scenes.length) return;
+function typeScene() {
+    const scene = scenes[index];
 
-    let scene = scenes[index];
-    textBox.className = "";
-    textBox.innerText = scene.text;
-    textBox.className = scene.class;
+    textElement.className = scene.class;
+    textElement.style.opacity = 0;
 
-    // 나타나기
-    setTimeout(() => { textBox.style.opacity = 1; }, 50);
-
-    // ⏳ 장면이 마지막이면 특수 처리
-    if (index === scenes.length - 1) {
-        // 2초 후 화면 깨짐 효과
-        setTimeout(() => {
-            document.body.classList.add("screen-break");
-        }, 1500);
-
-        // 3초 후 글자 버그난 듯 빠르게 불규칙 점멸
-        setTimeout(() => {
-            rapidGlitch();
-        }, 2300);
-
-        // 4.2초 후 글자 갑자기 사라짐
-        setTimeout(() => {
-            textBox.style.opacity = 0;
-        }, 4200);
-
-        // 4.8초 후 강제 이동
-        setTimeout(() => {
-            window.location.href = redirectURL;
-        }, 4800);
-        return;
-    }
-
-    // 일반 장면 처리
     setTimeout(() => {
-        textBox.style.opacity = 0;
+        textElement.innerHTML = scene.text;
+        textElement.style.opacity = 1;
+    }, 200);
+
+    // 다음 장면으로 넘어가기 + 마지막 장면 처리
+    setTimeout(() => {
+        textElement.style.opacity = 0;
         index++;
-        setTimeout(showScene, 1200);
-    }, 3300);
+
+        // 마지막 문장 끝난 후 강제 이동
+        if (index === scenes.length) {
+            setTimeout(() => {
+                window.location.href = "https://www.google.com";  // 원하는 링크로 변경
+            }, 2000);
+            return;
+        }
+
+        if (index < scenes.length) {
+            setTimeout(typeScene, 800);
+        }
+    }, 3500);
 }
 
-// 빠른 glitch 점멸
-function rapidGlitch() {
-    let count = 0;
-    let timer = setInterval(() => {
-        textBox.style.opacity = (textBox.style.opacity == 1 ? 0 : 1);
-        count++;
-        if (count > 10) clearInterval(timer);
-    }, 70);
-}
-
-showScene();
+typeScene();
 </script>
 
 </body>
